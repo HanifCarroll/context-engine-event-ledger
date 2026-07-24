@@ -11,6 +11,27 @@ require "context_ledger/backup"
 require "context_ledger/cli"
 
 class CLITest < ActiveSupport::TestCase
+  test "read commands work before any event has been appended" do
+    status_output = StringIO.new
+    timeline_output = StringIO.new
+
+    status = ContextLedger::CLI.new.run(
+      [ "ledger-status" ],
+      input: StringIO.new,
+      output: status_output
+    )
+    timeline = ContextLedger::CLI.new.run(
+      [ "timeline" ],
+      input: StringIO.new(JSON.generate("limit" => 20)),
+      output: timeline_output
+    )
+
+    assert_equal 0, status
+    assert_equal 0, timeline
+    assert JSON.parse(status_output.string).fetch("ok")
+    assert JSON.parse(timeline_output.string).fetch("ok")
+  end
+
   test "help is JSON and lists safe named commands" do
     output = StringIO.new
     status = ContextLedger::CLI.new.run([ "--help" ], input: StringIO.new, output: output)
