@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+ENV["RAILS_ENV"] ||= "development"
+
+require "pathname"
+require "fileutils"
+
+data_dir = Pathname(ENV.fetch("CONTEXT_LEDGER_DATA_DIR") {
+  File.join(Dir.home, ".local", "share", "context-ledger")
+})
+FileUtils.mkdir_p(data_dir, mode: 0o700)
+File.chmod(0o700, data_dir)
+ENV["LEDGER_DATABASE_PATH"] ||= data_dir.join("ledger.sqlite3").to_s
+
+require_relative "../config/environment"
+require "context_ledger"
+require "context_ledger/version"
+require "context_ledger/registry"
+require "context_ledger/proposal"
+require "context_ledger/projector"
+require "context_ledger/appender"
+require "context_ledger/query"
+require "context_ledger/integrity"
+require "context_ledger/backup"
+require "context_ledger/cli"
+
+ContextLedger::Paths.prepare!
+exit ContextLedger::CLI.new.run(ARGV)

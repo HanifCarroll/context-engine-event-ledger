@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "tmpdir"
+
+Dir.mktmpdir("context-ledger-smoke") do |directory|
+  environment = {
+    "CONTEXT_LEDGER_DATA_DIR" => directory,
+    "LEDGER_DATABASE_PATH" => File.join(directory, "ledger.sqlite3"),
+    "CONTEXT_LEDGER_EXTENSIONS" => File.expand_path("../examples/community-extension", __dir__),
+    "RAILS_ENV" => "development"
+  }
+
+  setup = system(environment, File.expand_path("context-ledger-setup", __dir__))
+  exit 1 unless setup
+
+  smoke = system(
+    environment,
+    File.expand_path("rails", __dir__),
+    "runner",
+    File.expand_path("../script/fictional_smoke.rb", __dir__)
+  )
+  exit(smoke ? 0 : 1)
+end

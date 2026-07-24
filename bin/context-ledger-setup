@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "pathname"
+
+data_dir = Pathname(ENV.fetch("CONTEXT_LEDGER_DATA_DIR") {
+  File.join(Dir.home, ".local", "share", "context-ledger")
+})
+FileUtils.mkdir_p(data_dir, mode: 0o700)
+File.chmod(0o700, data_dir)
+ENV["LEDGER_DATABASE_PATH"] = data_dir.join("ledger.sqlite3").to_s
+ENV["RAILS_ENV"] ||= "development"
+
+require_relative "../config/environment"
+ActiveRecord::Tasks::DatabaseTasks.prepare_all
+
+Dir.glob("#{data_dir}/*.sqlite3*").each { |path| File.chmod(0o600, path) if File.file?(path) }
+puts JSON.generate("ok" => true, "database" => ENV.fetch("LEDGER_DATABASE_PATH"))

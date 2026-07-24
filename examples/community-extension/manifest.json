@@ -1,0 +1,10 @@
+{
+  "id": "example-community",
+  "version": "1.0.0",
+  "files": {
+    "schemas/community.response_received.v1.json": "28f1aa4be3eeed790ce9350a176abb127263521dfb3435a7e8a040577d53cace"
+  },
+  "schemas": {
+    "community.response_received.v1": "schemas/community.response_received.v1.json"
+  }
+}

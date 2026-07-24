@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "pathname"
+
+target_directory = Pathname(ENV.fetch("CONTEXT_LEDGER_BIN_DIR") {
+  File.join(Dir.home, ".local", "bin")
+})
+FileUtils.mkdir_p(target_directory, mode: 0o755)
+
+repository_command = Pathname(__dir__).join("context-ledger").realpath
+target = target_directory.join("context-ledger")
+FileUtils.ln_sf(repository_command, target)
+
+puts "Installed #{target}"
